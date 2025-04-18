@@ -1,0 +1,61 @@
+2025-04-17 23:47:30 [main] INFO  ScraperApplication - Iniciando o Scraper da Amazon...
+2025-04-17 23:51:05 [main] INFO  ScraperApplication - Iniciando o Scraper da Amazon...
+2025-04-17 23:51:05 [main] WARN  br.com.scraper.selector.SelectorLoader - Arquivo de seletores [selectors_amazon.txt] não encontrado.
+2025-04-17 23:51:05 [main] INFO  br.com.scraper.config.RetryUtils - Tentativa 1/3...
+2025-04-17 23:51:05 [main] INFO  br.com.scraper.service.AmazonScraperService - Iniciando scraping da URL: https://www.amazon.com.br/s?k=Displayport+KVM+Switch
+2025-04-17 23:51:12 [main] INFO  io.github.bonigarcia.wdm.WebDriverManager - Using chromedriver 135.0.7049.95 (resolved driver for Chrome 135)
+2025-04-17 23:51:12 [main] INFO  io.github.bonigarcia.wdm.WebDriverManager - Exporting webdriver.chrome.driver as C:\Users\Vinicius\.cache\selenium\chromedriver\win64\135.0.7049.95\chromedriver.exe
+2025-04-17 23:51:17 [main] ERROR br.com.scraper.selenium.SeleniumSessionManager - Erro durante a sessão Selenium
+java.lang.IllegalStateException: Seletor 'product_block' não encontrado.
+	at br.com.scraper.service.AmazonScraperService.startScraping$lambda$0(AmazonScraperService.kt:30)
+	at br.com.scraper.selenium.SeleniumSessionManager.useSession(SeleniumSessionManager.kt:13)
+	at br.com.scraper.service.AmazonScraperService.startScraping(AmazonScraperService.kt:24)
+	at br.com.scraper.MainKt.main$lambda$0(main.kt:16)
+	at br.com.scraper.config.RetryUtils.executeWithRetry(RetryUtils.kt:21)
+	at br.com.scraper.config.RetryUtils.executeWithRetry$default(RetryUtils.kt:10)
+	at br.com.scraper.MainKt.main(main.kt:15)
+	at br.com.scraper.MainKt.main(main.kt)
+2025-04-17 23:51:17 [main] INFO  br.com.scraper.selenium.SeleniumSessionManager - Encerrando sessão WebDriver
+2025-04-17 23:51:17 [main] WARN  br.com.scraper.config.RetryUtils - Erro na tentativa 1: Seletor 'product_block' não encontrado.. Aguardando 2 segundos para nova tentativa.
+2025-04-17 23:51:19 [main] INFO  br.com.scraper.config.RetryUtils - Tentativa 2/3...
+2025-04-17 23:51:19 [main] INFO  br.com.scraper.service.AmazonScraperService - Iniciando scraping da URL: https://www.amazon.com.br/s?k=Displayport+KVM+Switch
+2025-04-17 23:51:19 [main] INFO  io.github.bonigarcia.wdm.WebDriverManager - Using chromedriver 135.0.7049.95 (resolved driver for Chrome 135)
+2025-04-17 23:51:19 [main] INFO  io.github.bonigarcia.wdm.WebDriverManager - Exporting webdriver.chrome.driver as C:\Users\Vinicius\.cache\selenium\chromedriver\win64\135.0.7049.95\chromedriver.exe
+2025-04-17 23:51:23 [main] ERROR br.com.scraper.selenium.SeleniumSessionManager - Erro durante a sessão Selenium
+java.lang.IllegalStateException: Seletor 'product_block' não encontrado.
+	at br.com.scraper.service.AmazonScraperService.startScraping$lambda$0(AmazonScraperService.kt:30)
+	at br.com.scraper.selenium.SeleniumSessionManager.useSession(SeleniumSessionManager.kt:13)
+	at br.com.scraper.service.AmazonScraperService.startScraping(AmazonScraperService.kt:24)
+	at br.com.scraper.MainKt.main$lambda$0(main.kt:16)
+	at br.com.scraper.config.RetryUtils.executeWithRetry(RetryUtils.kt:21)
+	at br.com.scraper.config.RetryUtils.executeWithRetry$default(RetryUtils.kt:10)
+	at br.com.scraper.MainKt.main(main.kt:15)
+	at br.com.scraper.MainKt.main(main.kt)
+2025-04-17 23:51:23 [main] INFO  br.com.scraper.selenium.SeleniumSessionManager - Encerrando sessão WebDriver
+2025-04-17 23:51:23 [main] WARN  br.com.scraper.config.RetryUtils - Erro na tentativa 2: Seletor 'product_block' não encontrado.. Aguardando 4 segundos para nova tentativa.
+2025-04-17 23:51:27 [main] INFO  br.com.scraper.config.RetryUtils - Tentativa 3/3...
+2025-04-17 23:51:27 [main] INFO  br.com.scraper.service.AmazonScraperService - Iniciando scraping da URL: https://www.amazon.com.br/s?k=Displayport+KVM+Switch
+2025-04-17 23:51:27 [main] INFO  io.github.bonigarcia.wdm.WebDriverManager - Using chromedriver 135.0.7049.95 (resolved driver for Chrome 135)
+2025-04-17 23:51:27 [main] INFO  io.github.bonigarcia.wdm.WebDriverManager - Exporting webdriver.chrome.driver as C:\Users\Vinicius\.cache\selenium\chromedriver\win64\135.0.7049.95\chromedriver.exe
+2025-04-17 23:51:30 [main] ERROR br.com.scraper.selenium.SeleniumSessionManager - Erro durante a sessão Selenium
+java.lang.IllegalStateException: Seletor 'product_block' não encontrado.
+	at br.com.scraper.service.AmazonScraperService.startScraping$lambda$0(AmazonScraperService.kt:30)
+	at br.com.scraper.selenium.SeleniumSessionManager.useSession(SeleniumSessionManager.kt:13)
+	at br.com.scraper.service.AmazonScraperService.startScraping(AmazonScraperService.kt:24)
+	at br.com.scraper.MainKt.main$lambda$0(main.kt:16)
+	at br.com.scraper.config.RetryUtils.executeWithRetry(RetryUtils.kt:21)
+	at br.com.scraper.config.RetryUtils.executeWithRetry$default(RetryUtils.kt:10)
+	at br.com.scraper.MainKt.main(main.kt:15)
+	at br.com.scraper.MainKt.main(main.kt)
+2025-04-17 23:51:30 [main] INFO  br.com.scraper.selenium.SeleniumSessionManager - Encerrando sessão WebDriver
+2025-04-17 23:51:30 [main] WARN  br.com.scraper.config.RetryUtils - Erro na tentativa 3: Seletor 'product_block' não encontrado.. Aguardando 8 segundos para nova tentativa.
+2025-04-17 23:51:38 [main] ERROR br.com.scraper.config.RetryUtils - Todas as tentativas falharam após 3 tentativas.
+java.lang.IllegalStateException: Seletor 'product_block' não encontrado.
+	at br.com.scraper.service.AmazonScraperService.startScraping$lambda$0(AmazonScraperService.kt:30)
+	at br.com.scraper.selenium.SeleniumSessionManager.useSession(SeleniumSessionManager.kt:13)
+	at br.com.scraper.service.AmazonScraperService.startScraping(AmazonScraperService.kt:24)
+	at br.com.scraper.MainKt.main$lambda$0(main.kt:16)
+	at br.com.scraper.config.RetryUtils.executeWithRetry(RetryUtils.kt:21)
+	at br.com.scraper.config.RetryUtils.executeWithRetry$default(RetryUtils.kt:10)
+	at br.com.scraper.MainKt.main(main.kt:15)
+	at br.com.scraper.MainKt.main(main.kt)
