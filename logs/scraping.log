@@ -1,1 +1,3 @@
-2025-04-18 13:37:34 [main] INFO  ScraperApplication - Finalizado. 56 produtos salvos.
+2025-04-18 18:44:37 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2025-04-18 18:44:37 [main] INFO  org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path ''
+2025-04-18 18:44:37 [main] INFO  br.com.scraper.ScraperApiApplicationKt - Started ScraperApiApplicationKt in 3.844 seconds (process running for 4.538)

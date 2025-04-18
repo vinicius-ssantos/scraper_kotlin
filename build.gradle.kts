@@ -1,7 +1,9 @@
 plugins {
     kotlin("jvm") version "2.0.21"
+    id("org.springframework.boot") version "3.2.5"
+    id("io.spring.dependency-management") version "1.1.4"
     application
-    id("com.github.johnrengelman.shadow") version "8.1.1" // ADICIONAR
+//    id("com.github.johnrengelman.shadow") version "8.1.1" // ADICIONAR
 
 }
 
@@ -36,22 +38,32 @@ dependencies {
     // Testes
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+
+    // Spring Boot Web
+    implementation("org.springframework.boot:spring-boot-starter-web")
+
+    implementation("org.yaml:snakeyaml:2.2")
+
 }
 
 application {
-    mainClass.set("br.com.scraper.ScraperApplicationKt")
+    mainClass.set("br.com.scraper.ScraperApiApplicationKt")
 }
 
 
-tasks {
-    named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
-        archiveBaseName.set("scraper")
-        archiveClassifier.set("")
-        archiveVersion.set("1.0-SNAPSHOT")
-    }
+
+
+tasks.withType<Jar> {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
+tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+    enabled = true
+}
 
+tasks.named<Jar>("jar") {
+    enabled = false
+}
 tasks.test {
     useJUnitPlatform()
 }

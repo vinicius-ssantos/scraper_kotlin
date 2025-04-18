@@ -1,29 +1,23 @@
 package br.com.scraper.selector
 
 import org.slf4j.LoggerFactory
-import java.io.File
-import java.nio.file.Paths
+import org.yaml.snakeyaml.Yaml
+import java.io.InputStream
 
 object SelectorLoader {
-
     private val logger = LoggerFactory.getLogger(SelectorLoader::class.java)
 
-    fun load(domain: String): Map<String, String> {
-        val filename = "selectors_${domain}.txt"
-        val path = Paths.get("src/main/resources", filename).toFile()
+    fun load(domain: String): Map<String, List<String>> {
+        val fileName = "selectors_$domain.yaml"
+        val inputStream: InputStream = javaClass.classLoader.getResourceAsStream(fileName)
+            ?: throw IllegalArgumentException("Arquivo de seletores não encontrado: $fileName")
 
-        if (!path.exists()) {
-            logger.warn("Arquivo de seletores [$filename] não encontrado.")
-            return emptyMap()
-        }
+        logger.info("Carregando seletores de: $fileName")
 
-        return path.readLines()
-            .filter { it.isNotBlank() && it.contains("=") }
-            .associate {
-                val (key, value) = it.split("=", limit = 2)
-                key.trim() to value.trim()
-            }.also {
-                logger.info("Seletores carregados de [$filename]: ${it.keys}")
-            }
+        val yaml = Yaml()
+        val data = yaml.load<Map<String, List<String>>>(inputStream)
+
+        logger.info("Seletores carregados: ${data.keys}")
+        return data
     }
 }
