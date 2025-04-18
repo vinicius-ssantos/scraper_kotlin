@@ -3,51 +3,53 @@ package br.com.scraper.service
 import br.com.scraper.model.Product
 import br.com.scraper.selector.SelectorLoader
 import br.com.scraper.selenium.SeleniumSessionManager
+import br.com.scraper.config.JsonWriter
 import org.openqa.selenium.By
+import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Service
 import java.io.File
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+@Service
 class AmazonScraperService(
     private val sessionManager: SeleniumSessionManager = SeleniumSessionManager()
-) {
+) : ScraperService {
+
     private val logger = LoggerFactory.getLogger(AmazonScraperService::class.java)
     private val selectors = SelectorLoader.load("amazon")
 
-    fun startScraping(url: String): List<Product> {
+    override fun startScraping(driver: WebDriver, url: String): List<Map<String, String>> {
         logger.info("Iniciando scraping da URL: $url")
-
         val products = mutableListOf<Product>()
+        val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
 
-        sessionManager.useSession { driver ->
+        try {
             driver.get(url)
 
-            // Salva o HTML da página para análise
-            val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
+            // Salvar HTML
             val htmlSource = driver.pageSource
             val htmlOutput = File("logs/html/html_debug_$timestamp.html")
-            htmlOutput.writeText(driver.pageSource)
+            htmlOutput.writeText(htmlSource)
             logger.info("HTML salvo em: ${htmlOutput.absolutePath}")
 
-            logger.debug("HTML da página carregada:\n" + driver.pageSource)
-
-            // Detecta bloqueios da Amazon por padrão de erro na página
             if (htmlSource.contains("algo deu errado", ignoreCase = true) ||
                 htmlSource.contains("Desculpe! Algo deu errado", ignoreCase = true) ||
-                htmlSource.contains("/error/500-title", ignoreCase = true)) {
+                htmlSource.contains("/error/500-title", ignoreCase = true)
+            ) {
                 logger.error("Página de bloqueio detectada! Scraping abortado.")
-                return@useSession
+                return emptyList()
             }
 
             val productElements = getWithFallback(driver, selectors["product_block"] ?: listOf())
             if (productElements.isEmpty()) {
                 logger.warn("Nenhum seletor de product_block funcionou.")
-                return@useSession
+                return emptyList()
             }
 
             logger.info("Foram encontrados ${productElements.size} blocos de produto.")
@@ -61,9 +63,9 @@ class AmazonScraperService(
                     val asin = element.getAttribute("data-asin") ?: "Indisponível"
 
                     if (title == "Indisponível" && price == "Indisponível" &&
-                        rating == "Indisponível" && reviews == "Indisponível") {
+                        rating == "Indisponível" && reviews == "Indisponível"
+                    ) {
                         logger.debug("Produto [$index] ignorado: todos os campos indisponíveis.")
-
                         continue
                     }
 
@@ -74,9 +76,25 @@ class AmazonScraperService(
                     logger.warn("Erro ao processar produto [$index]: ${e.message}")
                 }
             }
+
+            if (products.isNotEmpty()) {
+                JsonWriter.write(products)
+                logger.info("Produtos salvos com sucesso.")
+            }
+
+        } catch (e: Exception) {
+            logger.error("Erro durante o scraping: ${e.message}", e)
         }
 
-        return products
+        return products.map {
+            mapOf(
+                "asin" to it.asin,
+                "title" to it.title,
+                "price" to it.price,
+                "rating" to it.rating,
+                "reviews" to it.reviews
+            )
+        }
     }
 
     private fun extract(element: WebElement, key: String): String {
@@ -92,7 +110,7 @@ class AmazonScraperService(
         return "Indisponível"
     }
 
-    private fun getWithFallback(driver: org.openqa.selenium.WebDriver, selectors: List<String>): List<WebElement> {
+    private fun getWithFallback(driver: WebDriver, selectors: List<String>): List<WebElement> {
         val wait = WebDriverWait(driver, Duration.ofSeconds(20))
         for (selector in selectors) {
             try {
