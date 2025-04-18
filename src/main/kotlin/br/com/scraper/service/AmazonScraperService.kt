@@ -8,7 +8,10 @@ import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.slf4j.LoggerFactory
+import java.io.File
 import java.time.Duration
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class AmazonScraperService(
     private val sessionManager: SeleniumSessionManager = SeleniumSessionManager()
@@ -23,7 +26,23 @@ class AmazonScraperService(
 
         sessionManager.useSession { driver ->
             driver.get(url)
+
+            // Salva o HTML da página para análise
+            val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
+            val htmlSource = driver.pageSource
+            val htmlOutput = File("logs/html_debug_$timestamp.html")
+            htmlOutput.writeText(driver.pageSource)
+            logger.info("HTML salvo em: ${htmlOutput.absolutePath}")
+
             logger.debug("HTML da página carregada:\n" + driver.pageSource)
+
+            // Detecta bloqueios da Amazon por padrão de erro na página
+            if (htmlSource.contains("algo deu errado", ignoreCase = true) ||
+                htmlSource.contains("Desculpe! Algo deu errado", ignoreCase = true) ||
+                htmlSource.contains("/error/500-title", ignoreCase = true)) {
+                logger.error("Página de bloqueio detectada! Scraping abortado.")
+                return@useSession
+            }
 
             val productElements = getWithFallback(driver, selectors["product_block"] ?: listOf())
             if (productElements.isEmpty()) {
@@ -43,7 +62,8 @@ class AmazonScraperService(
 
                     if (title == "Indisponível" && price == "Indisponível" &&
                         rating == "Indisponível" && reviews == "Indisponível") {
-                        logger.debug("Produto [$index] ignorado por estar incompleto.")
+                        logger.debug("Produto [$index] ignorado: todos os campos indisponíveis.")
+
                         continue
                     }
 
