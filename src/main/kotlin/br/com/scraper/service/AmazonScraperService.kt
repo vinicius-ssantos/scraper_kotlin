@@ -30,7 +30,7 @@ class AmazonScraperService(
             // Salva o HTML da página para análise
             val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
             val htmlSource = driver.pageSource
-            val htmlOutput = File("logs/html_debug_$timestamp.html")
+            val htmlOutput = File("logs/html/html_debug_$timestamp.html")
             htmlOutput.writeText(driver.pageSource)
             logger.info("HTML salvo em: ${htmlOutput.absolutePath}")
 
