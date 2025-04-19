@@ -20,3 +20,11 @@ webdriver:
     - --no-sandbox
     - --disable-dev-shm-usage
     - --lang=pt-BR
+
+nordvpn:
+  username: itxFq8NpJ4GsHt6sc3cjGrcV
+  password: RgcicEGhakhedRm4tY4zfCy4
+  proxies:
+    - amsterdam.nl.socks.nordhold.net
+    - us.socks.nordhold.net
+    - stockholm.se.socks.nordhold.net

@@ -39,6 +39,10 @@ dependencies {
     // Jsoup
     implementation("org.jsoup:jsoup:1.17.2")
 
+    // Kotlin
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.7.3")
+
     // Testes
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
