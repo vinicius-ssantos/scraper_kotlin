@@ -2,7 +2,7 @@ package br.com.scraper.selenium
 
 import br.com.scraper.selenium.WebDriverFactory
 import br.com.scraper.utils.DelayStrategy
-import br.com.scraper.utils.RetryUtils
+import br.com.scraper.utils.DefaultRetryStrategy
 import br.com.scraper.utils.WaitMechanism
 import org.openqa.selenium.WebDriver
 import org.slf4j.LoggerFactory
@@ -21,8 +21,8 @@ class SeleniumSessionManager(
         val driver = webDriverFactory.create()
 
         return try {
-            val retryUtils = RetryUtils(delayStrategy, waitMechanism)
-            retryUtils.executeWithRetry {
+            val retryStrategy = DefaultRetryStrategy(delayStrategy, waitMechanism)
+            retryStrategy.execute {
                 action(driver)
             }
         } catch (ex: Exception) {

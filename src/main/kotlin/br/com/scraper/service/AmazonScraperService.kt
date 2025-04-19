@@ -1,22 +1,19 @@
 package br.com.scraper.service
 
-
 import br.com.scraper.utils.JsonWriter
-import br.com.scraper.utils.RetryUtils
 import br.com.scraper.model.Product
 import br.com.scraper.selenium.SeleniumSessionManager
-
 import br.com.scraper.utils.HtmlWriter
 import br.com.scraper.utils.SelectorLoader
 import br.com.scraper.utils.DelayStrategy
 import br.com.scraper.utils.WaitMechanism
+import br.com.scraper.utils.DefaultRetryStrategy
 import jakarta.annotation.PostConstruct
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -40,11 +37,10 @@ class AmazonScraperService(
         logger.info("Iniciando scraping da URL: $url")
         val products = mutableListOf<Product>()
         seleniumSessionManager.useSession { driver: WebDriver ->
-            val retryUtils = RetryUtils(delayStrategy, waitMechanism)
-            retryUtils.executeWithRetry {
+            val retryStrategy = DefaultRetryStrategy(delayStrategy, waitMechanism)
+            retryStrategy.execute {
                 driver.get(url)
 
-                // Salvar o HTML da página para depuração
                 savePageHtml(driver, "debug_page.html")
 
                 val blockSelectors = selectors["product_block"] ?: emptyList()
@@ -55,7 +51,7 @@ class AmazonScraperService(
                 }
                 if (productElements.isEmpty()) {
                     logger.warn("Nenhum seletor de product_block funcionou.")
-                    return@executeWithRetry
+                    return@execute
                 }
 
                 logger.info("Foram encontrados ${productElements.size} blocos de produto.")
