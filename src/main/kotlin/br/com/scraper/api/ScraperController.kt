@@ -1,7 +1,7 @@
 package br.com.scraper.api
 
-import br.com.scraper.model.Product
-import br.com.scraper.service.ScraperService
+import br.com.scraper.core.model.Product
+import br.com.scraper.core.ports.ScraperService
 import org.springframework.web.bind.annotation.*
 
 @RestController

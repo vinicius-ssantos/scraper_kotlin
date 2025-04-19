@@ -1,6 +1,7 @@
 package br.com.scraper.utils
 
-import br.com.scraper.model.Product
+import br.com.scraper.core.model.Product
+import br.com.scraper.infrastructure.writer.HtmlWriter
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.File

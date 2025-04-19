@@ -1,8 +1,10 @@
 package br.com.scraper.selenium
 
 
-import br.com.scraper.utils.DelayStrategy
-import br.com.scraper.utils.WaitMechanism
+import br.com.scraper.config.WebDriverConfig
+import br.com.scraper.core.strategy.DelayStrategy
+import br.com.scraper.core.strategy.WaitMechanism
+import br.com.scraper.infrastructure.selenium.SeleniumSessionManager
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
@@ -16,7 +18,7 @@ class SeleniumSessionManagerTest {
   val mockDriver = mock(WebDriver::class.java)
 
   // Mock do WebDriverFactory
-  val mockFactory = mock(WebDriverFactory::class.java)
+  val mockFactory = mock(WebDriverConfig::class.java)
   `when`(mockFactory.create()).thenReturn(mockDriver)
 
   // Mock das dependências adicionais

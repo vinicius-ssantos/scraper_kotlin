@@ -1,5 +1,8 @@
 package br.com.scraper.utils
 
+import br.com.scraper.core.strategy.DelayStrategy
+import br.com.scraper.core.strategy.WaitMechanism
+import br.com.scraper.infrastructure.strategy.DefaultRetryStrategy
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
@@ -35,9 +38,10 @@ class RetryUtilsTest {
   }
 
   assertEquals("Erro simulado", exception.message)
-  verify(delayStrategy, times(3)).calculateDelay(anyInt())
-  verify(waitMechanism, times(3)).waitFor(100L)
+  verify(delayStrategy, times(2)).calculateDelay(anyInt()) // 2 retries antes de falhar
+  verify(waitMechanism, times(2)).waitFor(100L)
  }
+
 
  @Test
  fun `deve realizar retries e ter sucesso antes do maximo de tentativas`() {

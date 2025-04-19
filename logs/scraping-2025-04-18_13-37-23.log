@@ -1,2 +1,0 @@
-2025-04-18 13:37:23 [main] INFO  io.github.bonigarcia.wdm.WebDriverManager - Using chromedriver 135.0.7049.95 (resolved driver for Chrome 135)
-2025-04-18 13:37:23 [main] INFO  io.github.bonigarcia.wdm.WebDriverManager - Exporting webdriver.chrome.driver as C:\Users\Vinicius\.cache\selenium\chromedriver\win64\135.0.7049.95\chromedriver.exe

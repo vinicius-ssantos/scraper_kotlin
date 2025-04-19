@@ -1,9 +1,9 @@
 package br.com.scraper.config
 
-import br.com.scraper.utils.DelayStrategy
-import br.com.scraper.utils.ExponentialDelayStrategy
-import br.com.scraper.utils.ThreadSleepWaitMechanism
-import br.com.scraper.utils.WaitMechanism
+import br.com.scraper.core.strategy.DelayStrategy
+import br.com.scraper.infrastructure.strategy.ExponentialDelayStrategy
+import br.com.scraper.infrastructure.strategy.ThreadSleepWaitMechanism
+import br.com.scraper.core.strategy.WaitMechanism
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 

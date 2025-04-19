@@ -1,2 +1,0 @@
-2025-04-18 13:37:21 [main] INFO  br.com.scraper.selector.SelectorLoader - Seletores carregados de [selectors_amazon.txt]: [product_block, title, price, rating, reviews]
-2025-04-18 13:37:21 [main] INFO  br.com.scraper.service.AmazonScraperService - Iniciando scraping da URL: https://www.amazon.com.br/s?k=Displayport+KVM+Switch
