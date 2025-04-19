@@ -1,9 +1,10 @@
 package br.com.scraper.service
 
-import SeleniumSessionManager
+
 import br.com.scraper.utils.JsonWriter
 import br.com.scraper.utils.RetryUtils
 import br.com.scraper.model.Product
+import br.com.scraper.selenium.SeleniumSessionManager
 
 import br.com.scraper.utils.HtmlWriter
 import br.com.scraper.utils.SelectorLoader

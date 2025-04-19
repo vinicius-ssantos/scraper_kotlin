@@ -8,15 +8,15 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class AppConfig {
+open class AppConfig {
 
     @Bean
-    fun delayStrategy(): DelayStrategy {
+    open fun delayStrategy(): DelayStrategy {
         return ExponentialDelayStrategy(baseDelay = 1000L)
     }
 
     @Bean
-    fun waitMechanism(): WaitMechanism {
+    open  fun waitMechanism(): WaitMechanism {
         return ThreadSleepWaitMechanism()
     }
 }

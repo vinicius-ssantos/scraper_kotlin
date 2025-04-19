@@ -1,3 +1,5 @@
+package br.com.scraper.selenium
+
 import br.com.scraper.selenium.WebDriverFactory
 import br.com.scraper.utils.DelayStrategy
 import br.com.scraper.utils.RetryUtils

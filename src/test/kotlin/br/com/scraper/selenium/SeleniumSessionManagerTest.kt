@@ -1,6 +1,6 @@
 package br.com.scraper.selenium
 
-import SeleniumSessionManager
+
 import br.com.scraper.utils.DelayStrategy
 import br.com.scraper.utils.WaitMechanism
 import org.junit.jupiter.api.Assertions.assertTrue

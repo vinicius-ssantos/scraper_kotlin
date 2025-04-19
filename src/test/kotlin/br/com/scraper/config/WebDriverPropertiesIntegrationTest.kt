@@ -8,7 +8,7 @@ import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest
 @ActiveProfiles("test")
-class WebDriverPropertiesIntegrationTest {
+open class WebDriverPropertiesIntegrationTest {
 
     @Autowired
     private lateinit var webDriverProperties: WebDriverProperties
