@@ -1,15 +1,17 @@
-package br.com.scraper.config
+package br.com.scraper.utils
 
 import org.slf4j.LoggerFactory
-import kotlin.math.pow
-import kotlin.time.Duration.Companion.seconds
 
-object RetryUtils {
+class RetryUtils(
+    private val delayStrategy: DelayStrategy,
+    private val waitMechanism: WaitMechanism
+) {
     private val logger = LoggerFactory.getLogger(RetryUtils::class.java)
 
     fun <T> executeWithRetry(
         maxRetries: Int = 3,
-        baseDelay: Long = 2L,
+        retryOn: List<Class<out Exception>> = listOf(Exception::class.java),
+        onFailure: ((attempt: Int, exception: Exception) -> Unit)? = null,
         operation: () -> T
     ): T {
         var attempt = 0
@@ -20,10 +22,13 @@ object RetryUtils {
                 logger.info("Tentativa ${attempt + 1}/$maxRetries...")
                 return operation()
             } catch (e: Exception) {
+                if (retryOn.none { it.isInstance(e) }) throw e
                 lastException = e
-                val delay = baseDelay * 2.0.pow(attempt.toDouble()).toLong()
-                logger.warn("Erro na tentativa ${attempt + 1}: ${e.message}. Aguardando $delay segundos para nova tentativa.")
-                Thread.sleep(delay.seconds.inWholeMilliseconds)
+                onFailure?.invoke(attempt + 1, e)
+
+                val delay = delayStrategy.calculateDelay(attempt)
+                logger.warn("Erro na tentativa ${attempt + 1}: ${e.message}. Aguardando ${delay}ms para nova tentativa.")
+                waitMechanism.waitFor(delay)
                 attempt++
             }
         }

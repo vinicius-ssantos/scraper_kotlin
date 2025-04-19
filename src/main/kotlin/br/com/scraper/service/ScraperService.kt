@@ -1,7 +1,7 @@
 package br.com.scraper.service
 
-import org.openqa.selenium.WebDriver
+import br.com.scraper.model.Product
 
 interface ScraperService {
-    fun startScraping(driver: WebDriver, url: String): List<Map<String, String>>
+    fun startScraping(url: String): List<Product>
 }

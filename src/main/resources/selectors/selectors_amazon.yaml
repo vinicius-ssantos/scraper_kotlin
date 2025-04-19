@@ -1,0 +1,20 @@
+product_block:
+  - div[data-asin]:not([data-asin=""]):not(.AdHolder)
+  - div[data-component-type='s-search-result']
+  - div[class*="s-result-item"]
+  - div.s-result-item[data-asin]
+
+title:
+  - h2 a span
+  - span.a-text-normal
+
+price:
+  - span.a-price span.a-offscreen
+  - span[class*='price']
+
+rating:
+  - span.a-icon-alt
+
+reviews:
+  - span[aria-label*='avaliação']
+  - span[aria-label*='classificação']

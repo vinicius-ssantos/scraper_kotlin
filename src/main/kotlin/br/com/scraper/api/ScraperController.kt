@@ -1,13 +1,13 @@
 package br.com.scraper.api
 
 import br.com.scraper.model.Product
-import br.com.scraper.service.AmazonScraperService
+import br.com.scraper.service.ScraperService
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/scrape")
 class ScraperController(
-    private val scraperService: AmazonScraperService = AmazonScraperService()
+    private val scraperService: ScraperService // interface
 ) {
 
     @GetMapping

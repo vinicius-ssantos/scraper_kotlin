@@ -1,23 +1,27 @@
-package br.com.scraper.selector
+package br.com.scraper.utils
 
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.slf4j.LoggerFactory
-import org.yaml.snakeyaml.Yaml
-import java.io.InputStream
 
 object SelectorLoader {
     private val logger = LoggerFactory.getLogger(SelectorLoader::class.java)
 
-    fun load(domain: String): Map<String, List<String>> {
-        val fileName = "selectors_$domain.yaml"
-        val inputStream: InputStream = javaClass.classLoader.getResourceAsStream(fileName)
-            ?: throw IllegalArgumentException("Arquivo de seletores não encontrado: $fileName")
+    fun load(fileName: String): Map<String, List<String>> {
+        val path = "selectors/$fileName.yaml"
+        val resource = SelectorLoader::class.java.classLoader.getResource(path)
+            ?: throw IllegalArgumentException("Arquivo de seletores não encontrado: $path")
 
-        logger.info("Carregando seletores de: $fileName")
+        logger.info("Carregando seletores do arquivo YAML: $path")
 
-        val yaml = Yaml()
-        val data = yaml.load<Map<String, List<String>>>(inputStream)
-
-        logger.info("Seletores carregados: ${data.keys}")
-        return data
+        return try {
+            val mapper = ObjectMapper(YAMLFactory()).registerKotlinModule()
+            mapper.readValue(resource, object : TypeReference<Map<String, List<String>>>() {})
+        } catch (e: Exception) {
+            logger.error("Erro ao carregar seletores de $path: ${e.message}", e)
+            throw e
+        }
     }
 }

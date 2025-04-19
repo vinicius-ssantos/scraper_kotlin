@@ -1,5 +1,0 @@
-product_block=div[data-component-type='s-search-result']
-title=h2 span.a-text-normal
-price=span.a-price span.a-offscreen
-rating=span.a-icon-alt
-reviews=span[aria-label$=" avaliações"] span

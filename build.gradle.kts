@@ -1,5 +1,6 @@
 plugins {
-    kotlin("jvm") version "2.0.21"
+    id("org.jetbrains.kotlin.jvm") version "2.0.21"
+    id("org.jetbrains.kotlin.kapt") version "2.0.21"
     id("org.springframework.boot") version "3.2.5"
     id("io.spring.dependency-management") version "1.1.4"
     application
@@ -38,12 +39,23 @@ dependencies {
     // Testes
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
+    }
 
     // Spring Boot Web
     implementation("org.springframework.boot:spring-boot-starter-web")
 
     implementation("org.yaml:snakeyaml:2.2")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.0")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.17.0")
 
+    implementation("org.springframework.boot:spring-boot-configuration-processor")
+    kapt("org.springframework.boot:spring-boot-configuration-processor")
+
+    testImplementation("org.mockito:mockito-core:5.7.0")
+//    testImplementation("org.mockito:mockito-inline:5.7.0")
 }
 
 application {
@@ -66,4 +78,7 @@ tasks.named<Jar>("jar") {
 }
 tasks.test {
     useJUnitPlatform()
+    systemProperty("spring.profiles.active", "test")
+    jvmArgs("-Djdk.instrument.traceUsage")
+//    jvmArgs = (jvmArgs ?: mutableListOf()) + "-XX:+EnableDynamicAgentLoading"
 }

@@ -1,125 +1,100 @@
 package br.com.scraper.service
 
+import SeleniumSessionManager
+import br.com.scraper.utils.JsonWriter
+import br.com.scraper.utils.RetryUtils
 import br.com.scraper.model.Product
-import br.com.scraper.selector.SelectorLoader
-import br.com.scraper.selenium.SeleniumSessionManager
-import br.com.scraper.config.JsonWriter
+
+import br.com.scraper.utils.HtmlWriter
+import br.com.scraper.utils.SelectorLoader
+import br.com.scraper.utils.DelayStrategy
+import br.com.scraper.utils.WaitMechanism
+import jakarta.annotation.PostConstruct
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
-import org.openqa.selenium.support.ui.ExpectedConditions
-import org.openqa.selenium.support.ui.WebDriverWait
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.io.File
-import java.time.Duration
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Service
 class AmazonScraperService(
-    private val sessionManager: SeleniumSessionManager = SeleniumSessionManager()
+    private val jsonWriter: JsonWriter,
+    private val seleniumSessionManager: SeleniumSessionManager,
+    private val delayStrategy: DelayStrategy,
+    private val waitMechanism: WaitMechanism
 ) : ScraperService {
 
     private val logger = LoggerFactory.getLogger(AmazonScraperService::class.java)
-    private val selectors = SelectorLoader.load("amazon")
+    private lateinit var selectors: Map<String, List<String>>
 
-    override fun startScraping(driver: WebDriver, url: String): List<Map<String, String>> {
+    @PostConstruct
+    fun init() {
+        selectors = SelectorLoader.load("selectors_amazon")
+    }
+
+    override fun startScraping(url: String): List<Product> {
         logger.info("Iniciando scraping da URL: $url")
         val products = mutableListOf<Product>()
-        val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
+        seleniumSessionManager.useSession { driver: WebDriver ->
+            val retryUtils = RetryUtils(delayStrategy, waitMechanism)
+            retryUtils.executeWithRetry {
+                driver.get(url)
 
-        try {
-            driver.get(url)
+                // Salvar o HTML da página para depuração
+                savePageHtml(driver, "debug_page.html")
 
-            // Salvar HTML
-            val htmlSource = driver.pageSource
-            val htmlOutput = File("logs/html/html_debug_$timestamp.html")
-            htmlOutput.writeText(htmlSource)
-            logger.info("HTML salvo em: ${htmlOutput.absolutePath}")
+                val blockSelectors = selectors["product_block"] ?: emptyList()
+                var productElements: List<WebElement> = emptyList()
+                for (selector in blockSelectors) {
+                    productElements = driver.findElements(By.cssSelector(selector))
+                    if (productElements.isNotEmpty()) break
+                }
+                if (productElements.isEmpty()) {
+                    logger.warn("Nenhum seletor de product_block funcionou.")
+                    return@executeWithRetry
+                }
 
-            if (htmlSource.contains("algo deu errado", ignoreCase = true) ||
-                htmlSource.contains("Desculpe! Algo deu errado", ignoreCase = true) ||
-                htmlSource.contains("/error/500-title", ignoreCase = true)
-            ) {
-                logger.error("Página de bloqueio detectada! Scraping abortado.")
-                return emptyList()
-            }
+                logger.info("Foram encontrados ${productElements.size} blocos de produto.")
 
-            val productElements = getWithFallback(driver, selectors["product_block"] ?: listOf())
-            if (productElements.isEmpty()) {
-                logger.warn("Nenhum seletor de product_block funcionou.")
-                return emptyList()
-            }
-
-            logger.info("Foram encontrados ${productElements.size} blocos de produto.")
-
-            for ((index, element) in productElements.withIndex()) {
-                try {
-                    val title = extract(element, "title")
-                    val price = extract(element, "price")
-                    val rating = extract(element, "rating")
-                    val reviews = extract(element, "reviews")
+                for (element in productElements) {
+                    val title = findTextInElement(element, selectors["title"])
+                    val price = findTextInElement(element, selectors["price"])
+                    val rating = findTextInElement(element, selectors["rating"])
+                    val reviews = findTextInElement(element, selectors["reviews"])
                     val asin = element.getAttribute("data-asin") ?: "Indisponível"
 
-                    if (title == "Indisponível" && price == "Indisponível" &&
-                        rating == "Indisponível" && reviews == "Indisponível"
-                    ) {
-                        logger.debug("Produto [$index] ignorado: todos os campos indisponíveis.")
-                        continue
-                    }
-
-                    logger.debug("Produto [$index] HTML:\n" + element.getAttribute("outerHTML"))
-
                     products.add(Product(asin, title, price, rating, reviews))
-                } catch (e: Exception) {
-                    logger.warn("Erro ao processar produto [$index]: ${e.message}")
                 }
             }
-
-            if (products.isNotEmpty()) {
-                JsonWriter.write(products)
-                logger.info("Produtos salvos com sucesso.")
-            }
-
-        } catch (e: Exception) {
-            logger.error("Erro durante o scraping: ${e.message}", e)
         }
 
-        return products.map {
-            mapOf(
-                "asin" to it.asin,
-                "title" to it.title,
-                "price" to it.price,
-                "rating" to it.rating,
-                "reviews" to it.reviews
-            )
+        jsonWriter.write(products)
+        return products
+    }
+
+    private fun savePageHtml(driver: WebDriver, baseFileName: String) {
+        try {
+            val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+            val formattedFileName = "${baseFileName}_$timestamp.html"
+            val htmlContent = driver.pageSource
+            HtmlWriter.saveHtml(htmlContent, formattedFileName)
+        } catch (e: Exception) {
+            logger.error("Erro ao salvar o HTML da página: ${e.message}", e)
         }
     }
 
-    private fun extract(element: WebElement, key: String): String {
-        val fallbackSelectors = selectors[key] ?: return "Indisponível"
-        for (selector in fallbackSelectors) {
+    private fun findTextInElement(element: WebElement, possibleSelectors: List<String>?): String {
+        if (possibleSelectors == null) return "Indisponível"
+        for (selector in possibleSelectors) {
             try {
-                val value = element.findElement(By.cssSelector(selector)).text.trim()
-                if (value.isNotBlank()) return value
+                val found = element.findElement(By.cssSelector(selector))
+                return found.text.trim().ifEmpty { "Indisponível" }
             } catch (_: Exception) {
-                logger.debug("Seletor falhou: $key -> $selector")
             }
         }
         return "Indisponível"
-    }
-
-    private fun getWithFallback(driver: WebDriver, selectors: List<String>): List<WebElement> {
-        val wait = WebDriverWait(driver, Duration.ofSeconds(20))
-        for (selector in selectors) {
-            try {
-                val elements = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(selector)))
-                if (elements.isNotEmpty()) return elements
-            } catch (e: Exception) {
-                logger.debug("Fallback de product_block falhou: $selector")
-            }
-        }
-        return emptyList()
     }
 }
